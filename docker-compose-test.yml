@@ -1,0 +1,21 @@
+services:
+  green-life-mongodb-test:
+    image: mongo:6.0
+    container_name: green-life-mongodb-test
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: test123!
+      MONGO_INITDB_DATABASE: green_life_test_db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 3
+      timeout: 3s
+
+  green-life-redis-test:
+    image: redis:alpine
+    container_name: green-life-redis-test
+    ports:
+      - 6379:6379

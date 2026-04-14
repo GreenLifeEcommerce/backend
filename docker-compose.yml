@@ -1,0 +1,47 @@
+services:
+  green-life-mongodb:
+    container_name: green-life-mongodb
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - green-life-mongodb-data:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - green-life-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 3
+      timeout: 3s
+
+  green-life-redis:
+    container_name: green-life-redis
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - green-life-redis-data:/data
+    ports:
+      - 6379:${REDIS_PORT}
+    networks:
+      - green-life-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 3
+      timeout: 3s
+
+volumes:
+  green-life-mongodb-data:
+    name: green-life-mongodb-data
+  green-life-redis-data:
+    name: green-life-redis-data
+
+networks:
+  green-life-network:
+    name: green-life-network
+    driver: bridge
