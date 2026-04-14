@@ -7,15 +7,15 @@ import {
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/mongoose';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { Model } from 'mongoose';
 
 import jwtConfig from '../common/config/jwt.config';
 import { MongoErrorCode } from '../common/enums/error-codes.enum';
 import { ActiveUserData } from '../common/interfaces/active-user-data.interface';
 import { RedisService } from '../redis/redis.service';
-import { User } from '../users/entities/user.entity';
+import { User, UserDocument } from '../users/entities/user.entity';
 import { BcryptService } from './bcrypt.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -27,8 +27,8 @@ export class AuthService {
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly bcryptService: BcryptService,
     private readonly jwtService: JwtService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
     private readonly redisService: RedisService,
   ) {}
 
@@ -36,10 +36,12 @@ export class AuthService {
     const { email, password } = signUpDto;
 
     try {
-      const user = new User();
-      user.email = email;
-      user.password = await this.bcryptService.hash(password);
-      await this.userRepository.save(user);
+      const hashedPassword = await this.bcryptService.hash(password);
+      const user = new this.userModel({
+        email,
+        password: hashedPassword,
+      });
+      await user.save();
     } catch (error) {
       if ((error as any).code === MongoErrorCode.UniqueViolation) {
         throw new ConflictException(`User [${email}] already exist`);
@@ -53,11 +55,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const { email, password } = signInDto;
 
-    const user = await this.userRepository.findOne({
-      where: {
-        email,
-      },
-    });
+    const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
       throw new BadRequestException('Invalid email');
     }
@@ -94,9 +92,7 @@ export class AuthService {
         throw new UnauthorizedException('Refresh token is invalid');
       }
 
-      const user = await this.userRepository.findOne({
-        where: { id: payload.id as any },
-      });
+      const user = await this.userModel.findById(payload.id).exec();
 
       if (!user) {
         throw new UnauthorizedException('User not found');
@@ -109,10 +105,10 @@ export class AuthService {
   }
 
   async generateTokens(
-    user: Partial<User>,
+    user: any,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const tokenId = randomUUID();
-    const userId = user.id.toString();
+    const userId = user._id.toString();
 
     const payload: ActiveUserData = {
       id: userId,
@@ -132,7 +128,6 @@ export class AuthService {
     ]);
 
     await this.redisService.insert(`user-${userId}`, tokenId);
-
     await this.redisService.insert(`refresh-token-${userId}`, refreshToken);
 
     return { accessToken, refreshToken };

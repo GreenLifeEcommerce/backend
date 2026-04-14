@@ -1,8 +1,8 @@
-import { INestApplication, Type, ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { DataSource } from 'typeorm';
 import { Redis } from 'ioredis';
-import { getDataSourceToken } from '@nestjs/typeorm';
+import { getConnectionToken } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
 import { AppModule } from 'src/app.module';
 import { TransformInterceptor } from '../../src/common/interceptors/transform.interceptor';
@@ -11,16 +11,12 @@ import { IORedisKey } from '../../src/redis/redis.constants';
 export class AppFactory {
   private constructor(
     private readonly appInstance: INestApplication,
-    private readonly dataSource: DataSource,
+    private readonly connection: Connection,
     private readonly redis: Redis,
   ) {}
 
   get instance() {
     return this.appInstance;
-  }
-
-  get dbSource() {
-    return this.dataSource;
   }
 
   static async new() {
@@ -44,13 +40,10 @@ export class AppFactory {
 
     await app.init();
 
-    const dataSource = module.get<DataSource>(
-      getDataSourceToken() as Type<DataSource>,
-    );
-
+    const connection = module.get<Connection>(getConnectionToken());
     const redis = module.get<Redis>(IORedisKey);
 
-    return new AppFactory(app, dataSource, redis);
+    return new AppFactory(app, connection, redis);
   }
 
   async close() {
@@ -59,13 +52,9 @@ export class AppFactory {
 
   async cleanupDB() {
     await this.redis.flushall();
-
-    const collections = this.dataSource.manager.connection.entityMetadatas.map(
-      (entity) => entity.tableName,
-    );
-    for (const collectionName of collections) {
-      const repository = this.dataSource.getMongoRepository(collectionName);
-      await repository.deleteMany({});
+    const collections = this.connection.collections;
+    for (const key in collections) {
+      await collections[key].deleteMany({});
     }
   }
 }

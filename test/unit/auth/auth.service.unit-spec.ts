@@ -5,9 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
+import { getModelToken } from '@nestjs/mongoose';
 
 import { AuthService } from '../../../src/auth/auth.service';
 import { BcryptService } from '../../../src/auth/bcrypt.service';
@@ -22,7 +20,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let bcryptService: BcryptService;
   let jwtService: JwtService;
-  let userRepository: Repository<User>;
+  let userModel: any;
   let redisService: RedisService;
 
   beforeEach(async () => {
@@ -44,11 +42,10 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: getRepositoryToken(User),
-          useValue: {
-            findOne: jest.fn(),
+          provide: getModelToken(User.name),
+          useValue: jest.fn().mockImplementation(() => ({
             save: jest.fn(),
-          },
+          })),
         },
         {
           provide: RedisService,
@@ -72,8 +69,12 @@ describe('AuthService', () => {
     authService = module.get<AuthService>(AuthService);
     bcryptService = module.get<BcryptService>(BcryptService);
     jwtService = module.get<JwtService>(JwtService);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    userModel = module.get(getModelToken(User.name));
     redisService = module.get<RedisService>(RedisService);
+
+    // Thêm static methods cho mock model
+    userModel.findOne = jest.fn();
+    userModel.findById = jest.fn();
   });
 
   describe('signUp', () => {
@@ -83,26 +84,25 @@ describe('AuthService', () => {
       passwordConfirm: 'password',
     };
 
-    const user = new User();
-    user.email = signUpDto.email;
-    user.password = 'hashedPassword';
-
-    beforeEach(() => {
-      jest.spyOn(bcryptService, 'hash').mockResolvedValue('hashedPassword');
-      jest.spyOn(userRepository, 'save').mockResolvedValue(user);
-    });
-
     it('should create a new user', async () => {
+      const saveMock = jest.fn().mockResolvedValue({});
+      userModel.mockImplementation(() => ({
+        save: saveMock,
+      }));
+
       await authService.signUp(signUpDto);
 
       expect(bcryptService.hash).toHaveBeenCalledWith(signUpDto.password);
-      expect(userRepository.save).toHaveBeenCalled();
+      expect(saveMock).toHaveBeenCalled();
     });
 
     it('should throw a ConflictException if a user with the same email already exists', async () => {
-      jest.spyOn(userRepository, 'save').mockRejectedValue({
+      const saveMock = jest.fn().mockRejectedValue({
         code: MongoErrorCode.UniqueViolation,
       });
+      userModel.mockImplementation(() => ({
+        save: saveMock,
+      }));
 
       await expect(authService.signUp(signUpDto)).rejects.toThrow(
         ConflictException,
@@ -116,13 +116,16 @@ describe('AuthService', () => {
       password: 'password',
     };
 
-    const user = new User();
-    user.id = new ObjectId();
-    user.email = signInDto.email;
-    user.password = 'hashedPassword';
+    const user = {
+      _id: '64f8a8b8e4b0a1a1a1a1a1a1',
+      email: signInDto.email,
+      password: 'hashedPassword',
+    };
 
     it('should sign in a user and return tokens', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
+      userModel.findOne.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(user),
+      });
       jest.spyOn(bcryptService, 'compare').mockResolvedValue(true);
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('token');
 

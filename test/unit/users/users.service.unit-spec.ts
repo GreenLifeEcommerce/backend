@@ -1,40 +1,42 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { ObjectId } from 'mongodb';
-import { Repository } from 'typeorm';
+import { getModelToken } from '@nestjs/mongoose';
 
 import { User } from '../../../src/users/entities/user.entity';
 import { UsersService } from '../../../src/users/users.service';
 
 describe('UsersService', () => {
   let usersService: UsersService;
-  let userRepository: Repository<User>;
+  let userModel: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         {
-          provide: getRepositoryToken(User),
+          provide: getModelToken(User.name),
           useValue: {
-            findOne: jest.fn(),
+            findById: jest.fn(),
           },
         },
       ],
     }).compile();
 
     usersService = module.get<UsersService>(UsersService);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    userModel = module.get(getModelToken(User.name));
   });
 
   describe('getMe', () => {
     it('should return a user with the specified ID', async () => {
-      const userId = new ObjectId().toString();
-      const user = new User();
-      user.id = new ObjectId(userId);
+      const userId = '64f8a8b8e4b0a1a1a1a1a1a1';
+      const user = {
+        _id: userId,
+        email: 'test@email.com',
+      };
 
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
+      userModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(user),
+      });
 
       const result = await usersService.getMe(userId);
 
@@ -42,8 +44,10 @@ describe('UsersService', () => {
     });
 
     it('should throw a BadRequestException if user is not found', async () => {
-      const userId = new ObjectId().toString();
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(undefined);
+      const userId = '64f8a8b8e4b0a1a1a1a1a1a1';
+      userModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(undefined),
+      });
 
       await expect(usersService.getMe(userId)).rejects.toThrow(
         BadRequestException,

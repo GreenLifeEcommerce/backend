@@ -1,45 +1,44 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ObjectId,
-  ObjectIdColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { HydratedDocument } from 'mongoose';
 
-@Entity({
-  name: 'categories',
+export type CategoryDocument = HydratedDocument<Category>;
+
+@Schema({
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: {
+    getters: true,
+    virtuals: true,
+  },
 })
 export class Category {
   @ApiProperty({
     description: 'ID of category',
     example: '64f8a8b8e4b0a1a1a1a1a1a1',
   })
-  @ObjectIdColumn()
   @Transform(({ value }) => value?.toString())
-  id: ObjectId;
+  _id: string;
 
   @ApiProperty({
     description: 'Name of category',
     example: 'Eco-friendly Products',
   })
-  @Column({ unique: true })
+  @Prop({ unique: true, required: true })
   name: string;
 
   @ApiProperty({
     description: 'Description of category',
     example: 'Reusable and sustainable products',
   })
-  @Column()
+  @Prop({ required: true })
   description: string;
 
   @ApiProperty({ description: 'Created date' })
-  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @ApiProperty({ description: 'Updated date' })
-  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
+
+export const CategorySchema = SchemaFactory.createForClass(Category);

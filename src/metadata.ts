@@ -1,8 +1,6 @@
 /* eslint-disable */
 export default async () => {
   const t = {
-    ['typeorm/driver/mongodb/bson.typings']:
-      await import('typeorm/driver/mongodb/bson.typings'),
     ['./users/entities/user.entity']:
       await import('./users/entities/user.entity'),
     ['./categories/entities/category.entity']:
@@ -15,10 +13,7 @@ export default async () => {
           import('./users/entities/user.entity'),
           {
             User: {
-              id: {
-                required: true,
-                type: () => t['typeorm/driver/mongodb/bson.typings'].ObjectId,
-              },
+              _id: { required: true, type: () => String },
               email: { required: true, type: () => String },
               createdAt: { required: true, type: () => Date },
               updatedAt: { required: true, type: () => Date },
@@ -72,10 +67,7 @@ export default async () => {
           import('./categories/entities/category.entity'),
           {
             Category: {
-              id: {
-                required: true,
-                type: () => t['typeorm/driver/mongodb/bson.typings'].ObjectId,
-              },
+              _id: { required: true, type: () => String },
               name: { required: true, type: () => String },
               description: { required: true, type: () => String },
               createdAt: { required: true, type: () => Date },
