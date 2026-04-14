@@ -1,20 +1,19 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { BcryptService } from './bcrypt.service';
-import { User } from '../users/entities/user.entity';
-import jwtConfig from '../common/config/jwt.config';
+import { AuthController } from './auth.controller';
+import { User, UserSchema } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync(jwtConfig.asProvider()),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    JwtModule.register({}),
   ],
-  controllers: [AuthController],
   providers: [AuthService, BcryptService],
-  exports: [JwtModule],
+  controllers: [AuthController],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
