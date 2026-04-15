@@ -52,7 +52,7 @@
     "@nestjs/schematics": "^11.0.10",
     "@nestjs/testing": "^11.1.19",
     "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.15.24",
+    "@swc/core": "^1.15.26",
     "@swc/helpers": "^0.5.15",
     "@swc/jest": "^0.2.39",
     "chokidar": "^5.0.0",
