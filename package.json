@@ -41,7 +41,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
     "ioredis": "^5.10.1",
-    "mongoose": "^8.10.1",
+    "mongoose": "^9.4.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1"
