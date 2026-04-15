@@ -55,7 +55,7 @@
     "@swc/core": "^1.15.24",
     "@swc/helpers": "^0.5.15",
     "@swc/jest": "^0.2.39",
-    "chokidar": "^4.0.0",
+    "chokidar": "^5.0.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
