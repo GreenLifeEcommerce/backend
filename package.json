@@ -28,6 +28,7 @@
     "docker:down": "docker-compose down"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.3.4",
     "@nestjs/common": "^11.1.19",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.19",
@@ -40,8 +41,10 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
+    "handlebars": "^4.7.9",
     "ioredis": "^5.10.1",
     "mongoose": "^9.4.1",
+    "nodemailer": "^8.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1"
@@ -55,7 +58,6 @@
     "@swc/core": "^1.15.26",
     "@swc/helpers": "^0.5.15",
     "@swc/jest": "^0.2.39",
-    "chokidar": "^5.0.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
@@ -64,6 +66,7 @@
     "@types/supertest": "^7.2.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.1",
+    "chokidar": "^5.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",

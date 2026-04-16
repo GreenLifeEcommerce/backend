@@ -16,6 +16,7 @@ import redisConfig from './common/config/redis.config';
 import { RedisModule } from './redis/redis.module';
 import swaggerConfig from './common/config/swagger.config';
 import { CategoriesModule } from './categories/categories.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     UsersModule,
     CategoriesModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
