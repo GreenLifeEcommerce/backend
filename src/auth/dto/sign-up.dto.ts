@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   Matches,
   MaxLength,
   MinLength,
@@ -18,6 +19,15 @@ export class SignUpDto {
   @MaxLength(255)
   @IsNotEmpty()
   readonly email: string;
+
+  @ApiProperty({
+    example: 'Nguyen Van A',
+    description: 'Name of user',
+    required: false,
+  })
+  @IsOptional()
+  @MaxLength(255)
+  readonly name?: string;
 
   @ApiProperty({
     description: 'Password of user',
