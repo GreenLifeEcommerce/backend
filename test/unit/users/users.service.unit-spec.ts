@@ -32,6 +32,13 @@ describe('UsersService', () => {
       const user = {
         _id: userId,
         email: 'test@email.com',
+        password: 'hashed-password',
+        toObject: jest.fn().mockReturnValue({
+          _id: userId,
+          email: 'test@email.com',
+          password: 'hashed-password',
+          name: undefined,
+        }),
       };
 
       userModel.findById.mockReturnValue({
@@ -40,7 +47,11 @@ describe('UsersService', () => {
 
       const result = await usersService.getMe(userId);
 
-      expect(result).toEqual(user);
+      expect(result).toEqual({
+        _id: userId,
+        email: 'test@email.com',
+      });
+      expect(result).not.toHaveProperty('password');
     });
 
     it('should throw a BadRequestException if user is not found', async () => {
