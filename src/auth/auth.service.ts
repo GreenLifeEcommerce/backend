@@ -33,12 +33,13 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    const { email, password } = signUpDto;
+    const { email, password, name } = signUpDto;
 
     try {
       const hashedPassword = await this.bcryptService.hash(password);
       const user = new this.userModel({
         email,
+        name,
         password: hashedPassword,
       });
       await user.save();
@@ -113,6 +114,7 @@ export class AuthService {
     const payload: ActiveUserData = {
       id: userId,
       email: user.email,
+      name: user.name,
       tokenId,
     };
 

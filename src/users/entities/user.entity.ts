@@ -24,6 +24,14 @@ export class User {
   @Prop({ unique: true, required: true })
   email: string;
 
+  @ApiProperty({
+    description: 'Name of user',
+    example: 'Nguyen Van A',
+    required: false,
+  })
+  @Prop({ required: false })
+  name?: string;
+
   @ApiHideProperty()
   @Prop({ required: true })
   @Exclude({ toPlainOnly: true })
