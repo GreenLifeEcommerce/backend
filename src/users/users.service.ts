@@ -18,7 +18,12 @@ export class UsersService {
         throw new BadRequestException('User not found');
       }
 
-      return user;
+      const plainUser = user.toObject();
+      const { password, ...rest } = plainUser;
+      return {
+        ...rest,
+        _id: rest._id.toString(),
+      } as unknown as User;
     } catch (error) {
       throw new BadRequestException('Invalid user ID format');
     }

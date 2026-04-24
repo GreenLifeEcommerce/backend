@@ -3,7 +3,7 @@ name: Dependabot auto-merge PRs if CI Testing succeeds
 on:
   pull_request_target:
   workflow_run:
-    workflows: ['CI Testing']
+    workflows: ['Green-Life CI Testing']
     types:
       - completed
 
@@ -14,7 +14,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }} && ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
         id: metadata

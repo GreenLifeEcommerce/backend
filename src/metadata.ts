@@ -1,8 +1,138 @@
 /* eslint-disable */
 export default async () => {
-    const t = {
-        ["./users/entities/user.entity"]: await import("./users/entities/user.entity"),
-        ["./categories/entities/category.entity"]: await import("./categories/entities/category.entity")
-    };
-    return { "@nestjs/swagger": { "models": [[import("./users/entities/user.entity"), { "User": { _id: { required: true, type: () => String }, email: { required: true, type: () => String }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } } }], [import("./auth/dto/sign-in.dto"), { "SignInDto": { email: { required: true, type: () => String, maxLength: 255, format: "email" }, password: { required: true, type: () => String, minLength: 8, maxLength: 20, pattern: "/((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$/" } } }], [import("./auth/dto/sign-up.dto"), { "SignUpDto": { email: { required: true, type: () => String, maxLength: 255, format: "email" }, password: { required: true, type: () => String, minLength: 8, maxLength: 20, pattern: "/((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$/" }, passwordConfirm: { required: true, type: () => String } } }], [import("./categories/entities/category.entity"), { "Category": { _id: { required: true, type: () => String }, name: { required: true, type: () => String }, description: { required: true, type: () => String }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } } }], [import("./categories/dto/category.dto"), { "CreateCategoryDto": { name: { required: true, type: () => String }, description: { required: true, type: () => String } }, "UpdateCategoryDto": {} }]], "controllers": [[import("./app.controller"), { "AppController": { "getHello": { type: String } } }], [import("./auth/auth.controller"), { "AuthController": { "signUp": {}, "signIn": {}, "signOut": {}, "refreshTokens": {} } }], [import("./users/users.controller"), { "UsersController": { "getMe": { type: t["./users/entities/user.entity"].User } } }], [import("./categories/categories.controller"), { "CategoriesController": { "create": { type: t["./categories/entities/category.entity"].Category }, "findAll": { type: [t["./categories/entities/category.entity"].Category] }, "findOne": { type: t["./categories/entities/category.entity"].Category }, "update": { type: t["./categories/entities/category.entity"].Category }, "remove": {} } }]] } };
+  const t = {
+    ['./users/entities/user.entity']:
+      await import('./users/entities/user.entity'),
+    ['./categories/entities/category.entity']:
+      await import('./categories/entities/category.entity'),
+  };
+  return {
+    '@nestjs/swagger': {
+      models: [
+        [
+          import('./users/entities/user.entity'),
+          {
+            User: {
+              _id: { required: true, type: () => String },
+              email: { required: true, type: () => String },
+              name: { required: false, type: () => String },
+              createdAt: { required: true, type: () => Date },
+              updatedAt: { required: true, type: () => Date },
+            },
+          },
+        ],
+        [
+          import('./auth/dto/sign-in.dto'),
+          {
+            SignInDto: {
+              email: {
+                required: true,
+                type: () => String,
+                maxLength: 255,
+                format: 'email',
+              },
+              password: {
+                required: true,
+                type: () => String,
+                minLength: 8,
+                maxLength: 20,
+                pattern:
+                  '((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+              },
+            },
+          },
+        ],
+        [
+          import('./auth/dto/sign-up.dto'),
+          {
+            SignUpDto: {
+              email: {
+                required: true,
+                type: () => String,
+                maxLength: 255,
+                format: 'email',
+              },
+              name: { required: false, type: () => String, maxLength: 255 },
+              password: {
+                required: true,
+                type: () => String,
+                minLength: 8,
+                maxLength: 20,
+                pattern:
+                  '((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+              },
+              passwordConfirm: { required: true, type: () => String },
+            },
+          },
+        ],
+        [
+          import('./categories/entities/category.entity'),
+          {
+            Category: {
+              _id: { required: true, type: () => String },
+              name: { required: true, type: () => String },
+              description: { required: true, type: () => String },
+              createdAt: { required: true, type: () => Date },
+              updatedAt: { required: true, type: () => Date },
+            },
+          },
+        ],
+        [
+          import('./categories/dto/category.dto'),
+          {
+            CreateCategoryDto: {
+              name: { required: true, type: () => String },
+              description: { required: true, type: () => String },
+            },
+            UpdateCategoryDto: {},
+          },
+        ],
+      ],
+      controllers: [
+        [
+          import('./app.controller'),
+          { AppController: { getHello: { type: String } } },
+        ],
+        [
+          import('./auth/auth.controller'),
+          {
+            AuthController: {
+              signUp: {},
+              signIn: {},
+              signOut: {},
+              refreshTokens: {},
+            },
+          },
+        ],
+        [
+          import('./users/users.controller'),
+          {
+            UsersController: {
+              getMe: { type: t['./users/entities/user.entity'].User },
+            },
+          },
+        ],
+        [
+          import('./categories/categories.controller'),
+          {
+            CategoriesController: {
+              create: {
+                type: t['./categories/entities/category.entity'].Category,
+              },
+              findAll: {
+                type: [t['./categories/entities/category.entity'].Category],
+              },
+              findOne: {
+                type: t['./categories/entities/category.entity'].Category,
+              },
+              update: {
+                type: t['./categories/entities/category.entity'].Category,
+              },
+              remove: {},
+            },
+          },
+        ],
+      ],
+    },
+  };
 };

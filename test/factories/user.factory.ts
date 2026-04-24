@@ -1,26 +1,25 @@
-import { DataSource, EntityManager } from 'typeorm';
+import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
-import { User } from '../../src/users/entities/user.entity';
+import { User, UserDocument } from '../../src/users/entities/user.entity';
 
 export class UserFactory {
-  private dataSource: DataSource;
+  private userModel: Model<UserDocument>;
 
-  static new(dataSource: DataSource) {
+  static new(userModel: Model<UserDocument>) {
     const factory = new UserFactory();
-    factory.dataSource = dataSource;
+    factory.userModel = userModel;
     return factory;
   }
 
   async create(user: Partial<User> = {}) {
-    const userRepository = this.dataSource.getRepository(User);
     const salt = await bcrypt.genSalt();
-    const password = await this.hashPassword(user.password, salt);
-    const payload = {
-      ...user,
+    const password = await this.hashPassword(user.password || 'Pass#123', salt);
+    return this.userModel.create({
+      email: user.email,
       password,
-    };
-    return userRepository.save(payload);
+      ...(user.name ? { name: user.name } : {}),
+    });
   }
 
   private hashPassword(password: string, salt: string) {
