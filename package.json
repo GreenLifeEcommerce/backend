@@ -42,7 +42,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
     "handlebars": "^4.7.9",
-    "ioredis": "^5.11.1",
+    "ioredis": "^6.0.0",
     "mongoose": "^9.9.1",
     "nodemailer": "^9.0.3",
     "reflect-metadata": "^0.2.2",
